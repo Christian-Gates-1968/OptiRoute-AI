@@ -5,7 +5,6 @@ This module contains the core routing logic that decides which LLM to use based 
 
 import os
 from typing import Tuple
-from langchain_openai import ChatOpenAI
 from langchain_groq import ChatGroq
 from dotenv import load_dotenv
 
@@ -26,16 +25,15 @@ class ModelRouter:
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
         self.groq_api_key = os.getenv("GROQ_API_KEY")
         
-        if not self.openai_api_key:
-            raise ValueError("OPENAI_API_KEY not found in environment variables")
+        
         if not self.groq_api_key:
             raise ValueError("GROQ_API_KEY not found in environment variables")
         
-        # Initialize the "Smart" model (GPT-4) - High quality, higher cost
-        self.llm_smart = ChatOpenAI(
-            model="gpt-4",
-            api_key=self.openai_api_key,
-            temperature=0.7
+        # Initialize the "Smart" model (Llama 3.3 70B via Groq) - High quality, still free
+        self.llm_smart = ChatGroq(
+        model="llama-3.3-70b-versatile",
+        api_key=self.groq_api_key,
+        temperature=0.7
         )
         
         # Initialize the "Fast" model (Llama 3.1 via Groq) - Fast, low cost
@@ -76,7 +74,7 @@ class ModelRouter:
                 "complexity": "high",
                 "word_count": word_count,
                 "has_reasoning": has_reasoning_keyword,
-                "model": "gpt-4",
+                "model": "llama-3.3-70b-versatile",
                 "provider": "openai",
                 "reason": "Complex query detected - requires advanced reasoning",
                 "icon": "🧠"
@@ -107,7 +105,7 @@ class ModelRouter:
         if analysis["provider"] == "openai":
             return (
                 self.llm_smart,
-                f"{analysis['icon']} GPT-4 (Smart Model)",
+                f"{analysis['icon']} Llama 3.3 70B (Smart Model)",
                 analysis
             )
         else:
