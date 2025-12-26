@@ -11,10 +11,10 @@ Companies waste thousands of dollars sending simple queries (like "Hello" or "Wh
 ## 💡 The Solution
 
 **OptiRoute AI** analyzes incoming prompts in real-time and intelligently routes them:
-- **Simple queries** → Fast, cost-efficient models (Llama 3 via Groq)
-- **Complex queries** → High-reasoning models (GPT-4)
+- **Simple queries** → Ultra-fast models (Llama 3.1 8B via Groq)
+- **Complex queries** → High-reasoning models (Llama 3.3 70B via Groq)
 
-This demonstrates **cost-of-inference optimization** and **architectural thinking** required for scalable GenAI systems.
+This demonstrates **cost-of-inference optimization** and **architectural thinking** required for scalable GenAI systems - all while running on free-tier infrastructure.
 
 ---
 
@@ -34,9 +34,9 @@ This demonstrates **cost-of-inference optimization** and **architectural thinkin
 │  - Keyword detection│
 └──────┬──────────────┘
        │
-       ├──── Simple ───────► Groq (Llama 3) ──► ⚡ Fast & Cheap
+       ├──── Simple ───────► Groq (Llama 3.1 8B) ──► ⚡ Ultra Fast & Free
        │
-       └──── Complex ──────► OpenAI (GPT-4) ──► 🧠 Smart & Deep
+       └──── Complex ──────► Groq (Llama 3.3 70B) ──► 🧠 Smart & Free
 ```
 
 ---
@@ -47,7 +47,7 @@ This demonstrates **cost-of-inference optimization** and **architectural thinkin
 |-------|------------|--------|
 | **Frontend** | Streamlit | Rapid prototyping, clean UI |
 | **Backend Logic** | Python + LangChain | Industry standard for AI orchestration |
-| **AI Models** | GPT-4 (OpenAI) + Llama 3 (Groq) | High quality + High speed options |
+| **AI Models** | Llama 3.1 8B + Llama 3.3 70B (Groq) | Zero-cost, production-grade speed |
 | **Environment** | python-dotenv | Security best practices |
 
 ---
@@ -70,8 +70,7 @@ OptiRoute AI/
 
 ### Prerequisites
 - Python 3.8 or higher
-- OpenAI API key ([Get here](https://platform.openai.com/api-keys))
-- Groq API key ([Get here](https://console.groq.com/keys) - **FREE**)
+- Groq API key ([Get here](https://console.groq.com/keys) - **100% FREE, No Credit Card**)
 
 ### Installation
 
@@ -95,7 +94,7 @@ pip install -r requirements.txt
 4. **Set up environment variables:**
 ```bash
 cp .env.example .env
-# Edit .env and add your API keys
+# Edit .env and add your GROQ_API_KEY (get it free at console.groq.com)
 ```
 
 5. **Run the application:**
@@ -112,14 +111,14 @@ Navigate to `http://localhost:8501`
 
 ### Example Queries
 
-**Simple Query** (Routes to Groq/Llama 3):
+**Simple Query** (Routes to Llama 3.1 8B - Ultra Fast):
 ```
 "What is Python?"
 "Hello, how are you?"
 "Define machine learning"
 ```
 
-**Complex Query** (Routes to GPT-4):
+**Complex Query** (Routes to Llama 3.3 70B - Smart Reasoning):
 ```
 "Explain the differences between REST and GraphQL APIs"
 "Analyze the trade-offs between microservices and monolithic architecture"
@@ -133,12 +132,12 @@ Navigate to `http://localhost:8501`
 The system analyzes prompts using two heuristics:
 
 1. **Word Count Analysis**
-   - Simple: ≤ 15 words → Groq (Fast)
-   - Complex: > 15 words → GPT-4 (Smart)
+   - Simple: ≤ 15 words → Llama 3.1 8B (Ultra Fast)
+   - Complex: > 15 words → Llama 3.3 70B (Smart)
 
 2. **Keyword Detection**
-   - Contains reasoning keywords ("explain", "analyze", "compare", "why") → GPT-4
-   - No reasoning keywords → Groq
+   - Contains reasoning keywords ("explain", "analyze", "compare", "why") → Llama 3.3 70B
+   - No reasoning keywords → Llama 3.1 8B
 
 ---
 
@@ -146,19 +145,20 @@ The system analyzes prompts using two heuristics:
 
 ### Estimated Savings
 
-| Scenario | Traditional (All GPT-4) | OptiRoute AI | Savings |
-|----------|------------------------|--------------|---------|
-| 1000 simple queries | $30 | $2 | **$28 (93%)** |
-| 1000 mixed queries | $30 | $15 | **$15 (50%)** |
+| Scenario | Traditional (All GPT-4) | OptiRoute AI (Groq) | Savings |
+|----------|------------------------|---------------------|---------||
+| 1000 simple queries | $30 | **$0** (Free) | **$30 (100%)** |
+| 1000 mixed queries | $30 | **$0** (Free) | **$30 (100%)** |
+| 10,000 requests/day | $300/day | **$0** (Free tier) | **$300/day** |
 
-*Based on approximate pricing: GPT-4 ($0.03/request), Llama 3 via Groq ($0.002/request)*
+*Groq offers 14,400 free requests per day - perfect for startups and demos!*
 
 ---
 
 ## 🔮 Future Scaling Strategy
 
 ### Phase 1: Current State (MVP)
-- API-based routing (OpenAI + Groq)
+- Dual-model routing (Both via Groq - 100% free)
 - Simple complexity heuristics
 - Streamlit dashboard
 
@@ -166,13 +166,14 @@ The system analyzes prompts using two heuristics:
 - ML-based complexity classifier (Fine-tuned BERT)
 - Semantic caching with Redis (avoid duplicate LLM calls)
 - PostgreSQL for analytics and usage tracking
+- Add GPT-4/Claude for mission-critical queries (hybrid approach)
 
 ### Phase 3: Self-Hosted Infrastructure (Month 6+)
-**When user base hits 10k+:**
-- Deploy self-hosted Llama 3 on AWS Inferentia or NVIDIA A100s
+**When user base exceeds Groq's free tier (14k+ requests/day):**
+- Option A: Groq paid tier (still cheaper than others)
+- Option B: Self-hosted Llama 3 on AWS Inferentia or NVIDIA A100s
 - Kubernetes orchestration for GPU workloads
 - Load balancing across multiple model instances
-- Cost reduction: API ($0.002/req) → Self-hosted ($0.0005/req)
 
 **Infrastructure Blueprint:**
 ```yaml
@@ -203,8 +204,9 @@ spec:
 |----------|-----|-----------|
 | **LangChain** | Standard abstraction layer for LLMs | Adds dependency, but enables model swapping |
 | **Streamlit** | Fastest MVP frontend | Not for production scale, but perfect for demos |
-| **Groq (not local Llama)** | <100ms latency vs 2-3s local | API cost vs infrastructure cost |
+| **Groq (both models)** | <100ms latency + zero cost | Free tier limits (14k/day), but perfect for MVP |
 | **Simple heuristics** | Ship fast, iterate later | Less accurate than ML, but good enough for MVP |
+| **No OpenAI** | Avoid costs during development | Can add later for premium features |
 
 ### What I'd Do Differently at Scale
 - **Rate Limiting**: Implement per-user quotas with Redis
@@ -252,7 +254,7 @@ Built as a demonstration of:
 
 **Built by:** A Founding Engineer candidate
 **Tech Used for First Time:** Groq LPU API (learned and integrated in 4 hours)
-**Business Impact:** Potential 50-90% cost reduction in GenAI operations
+**Business Impact:** 100% cost reduction in GenAI operations (vs traditional GPT-4-only approach)
 
 ---
 
