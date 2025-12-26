@@ -38,9 +38,9 @@ class ModelRouter:
             temperature=0.7
         )
         
-        # Initialize the "Fast" model (Llama 3 via Groq) - Fast, low cost
+        # Initialize the "Fast" model (Llama 3.1 via Groq) - Fast, low cost
         self.llm_fast = ChatGroq(
-            model="llama3-8b-8192",
+            model="llama-3.1-8b-instant",
             api_key=self.groq_api_key,
             temperature=0.7
         )
@@ -86,7 +86,7 @@ class ModelRouter:
                 "complexity": "low",
                 "word_count": word_count,
                 "has_reasoning": has_reasoning_keyword,
-                "model": "llama3-8b-8192",
+                "model": "llama-3.1-8b-instant",
                 "provider": "groq",
                 "reason": "Simple query - optimizing for speed and cost",
                 "icon": "⚡"
