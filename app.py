@@ -7,7 +7,9 @@ import streamlit as st
 from router import ModelRouter
 import time
 import os
+import json
 from datetime import datetime
+from pathlib import Path
 
 # Page configuration
 st.set_page_config(
@@ -42,15 +44,74 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+# History persistence functions
+HISTORY_FILE = Path("data/history.json")
+STATS_FILE = Path("data/stats.json")
+
+def ensure_data_dir():
+    """Ensure data directory exists."""
+    HISTORY_FILE.parent.mkdir(exist_ok=True)
+
+def load_history():
+    """Load history from JSON file."""
+    ensure_data_dir()
+    if HISTORY_FILE.exists():
+        try:
+            with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return []
+    return []
+
+def save_history(history):
+    """Save history to JSON file."""
+    ensure_data_dir()
+    try:
+        with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
+            json.dump(history, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        st.error(f"Failed to save history: {str(e)}")
+
+def load_stats():
+    """Load stats from JSON file."""
+    ensure_data_dir()
+    if STATS_FILE.exists():
+        try:
+            with open(STATS_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception:
+            return {"total_requests": 0, "fast_model_count": 0, "smart_model_count": 0}
+    return {"total_requests": 0, "fast_model_count": 0, "smart_model_count": 0}
+
+def save_stats(total, fast, smart):
+    """Save stats to JSON file."""
+    ensure_data_dir()
+    try:
+        with open(STATS_FILE, 'w', encoding='utf-8') as f:
+            json.dump({
+                "total_requests": total,
+                "fast_model_count": fast,
+                "smart_model_count": smart
+            }, f, indent=2)
+    except Exception as e:
+        st.error(f"Failed to save stats: {str(e)}")
+
 # Initialize session state
 if "history" not in st.session_state:
-    st.session_state.history = []
+    st.session_state.history = load_history()
+    
 if "total_requests" not in st.session_state:
-    st.session_state.total_requests = 0
+    stats = load_stats()
+    st.session_state.total_requests = stats["total_requests"]
 if "fast_model_count" not in st.session_state:
-    st.session_state.fast_model_count = 0
+    stats = load_stats()
+    st.session_state.fast_model_count = stats["fast_model_count"]
 if "smart_model_count" not in st.session_state:
-    st.session_state.smart_model_count = 0
+    stats = load_stats()
+    st.session_state.smart_model_count = stats["smart_model_count"]
+
+if "show_result" not in st.session_state:
+    st.session_state.show_result = None
 
 # Initialize router
 @st.cache_resource
@@ -143,6 +204,9 @@ if clear_button:
     st.session_state.total_requests = 0
     st.session_state.fast_model_count = 0
     st.session_state.smart_model_count = 0
+    # Clear persisted data
+    save_history([])
+    save_stats(0, 0, 0)
     st.rerun()
 
 # Process the prompt
@@ -170,8 +234,30 @@ if submit_button and prompt:
             "result": result,
             "response_time": response_time
         })
+        
+        # Persist to file
+        save_history(st.session_state.history)
+        save_stats(
+            st.session_state.total_requests,
+            st.session_state.fast_model_count,
+            st.session_state.smart_model_count
+        )
+        
+        # Store result to show after rerun
+        st.session_state.show_result = {
+            "result": result,
+            "response_time": response_time,
+            "prompt": prompt
+        }
+        
+        # Rerun to update dashboard
+        st.rerun()
+
+# Display the most recent result if available
+if st.session_state.show_result:
+    result = st.session_state.show_result["result"]
+    response_time = st.session_state.show_result["response_time"]
     
-    # Display results
     if result["success"]:
         st.success("✅ Response Generated Successfully")
         
@@ -194,8 +280,12 @@ if submit_button and prompt:
         st.subheader("💡 Response")
         st.markdown(f"**{result['response']}**")
         
+        # Clear the show_result flag
+        st.session_state.show_result = None
+        
     else:
         st.error(f"❌ Error: {result['error']}")
+        st.session_state.show_result = None
 
 elif submit_button and not prompt:
     st.warning("⚠️ Please enter a prompt before submitting.")
