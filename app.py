@@ -6,6 +6,7 @@ Interactive frontend for the intelligent GenAI routing system.
 import streamlit as st
 from router import ModelRouter
 import time
+import os
 from datetime import datetime
 
 # Page configuration
@@ -88,15 +89,23 @@ with st.sidebar:
     **OptiRoute AI** is an intelligent middleware that:
     
     - 🎯 **Analyzes** prompt complexity
-    - ⚡ **Routes** simple queries to fast models (Groq/Llama 3)
-    - 🧠 **Escalates** complex queries to GPT-4
+    - ⚡ **Routes** simple queries to fast models (Llama 3.1 via Groq)
+    - 🧠 **Escalates** complex queries to Llama 3.3 70B via Groq
     - 💰 **Saves** costs through smart routing
     
     **Tech Stack:**
     - Frontend: Streamlit
     - Backend: LangChain
-    - Models: GPT-4 & Llama 3 (Groq)
+    - Models: Llama 3 (Groq)
+    - Deployment: Docker
     """)
+    
+    # Show deployment environment
+    is_docker = os.path.exists('/.dockerenv')
+    if is_docker:
+        st.success("🐳 Running in Docker Container")
+    else:
+        st.info("💻 Running Locally")
     
     st.divider()
     

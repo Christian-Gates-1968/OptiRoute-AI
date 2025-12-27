@@ -1,0 +1,25 @@
+services:
+  optiroute-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: optiroute-ai
+    ports:
+      - "8501:8501"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    env_file:
+      - .env
+    volumes:
+      # Mount code for development (comment out in production)
+      - .:/app
+      # Prevent overwriting installed packages
+      - /app/__pycache__
+    restart: unless-stopped
+    networks:
+      - optiroute-network
+
+networks:
+  optiroute-network:
+    driver: bridge

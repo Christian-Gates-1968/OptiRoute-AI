@@ -48,6 +48,7 @@ This demonstrates **cost-of-inference optimization** and **architectural thinkin
 | **Frontend** | Streamlit | Rapid prototyping, clean UI |
 | **Backend Logic** | Python + LangChain | Industry standard for AI orchestration |
 | **AI Models** | Llama 3.1 8B + Llama 3.3 70B (Groq) | Zero-cost, production-grade speed |
+| **Deployment** | Docker + Docker Compose | Containerization for consistency & portability |
 | **Environment** | python-dotenv | Security best practices |
 
 ---
@@ -59,6 +60,10 @@ OptiRoute AI/
 ├── app.py                 # Streamlit dashboard (Frontend)
 ├── router.py              # Intelligence layer (Core Logic)
 ├── requirements.txt       # Python dependencies
+├── Dockerfile             # Docker image configuration
+├── docker-compose.yml     # Docker orchestration
+├── .dockerignore          # Docker build exclusions
+├── .env                   # Environment variables (not committed)
 ├── .env.example           # API key template
 ├── .gitignore            # Git exclusions
 └── README.md             # This file
@@ -69,10 +74,58 @@ OptiRoute AI/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Python 3.8 or higher
+- **Option 1 (Docker - Recommended):** Docker Desktop installed
+- **Option 2 (Manual):** Python 3.8 or higher
 - Groq API key ([Get here](https://console.groq.com/keys) - **100% FREE, No Credit Card**)
 
-### Installation
+### 🐳 Option 1: Docker Deployment (Recommended)
+
+**Fastest way to get started - One command deployment!**
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/yourusername/optiroute-ai.git
+cd optiroute-ai
+```
+
+2. **Set up environment variables:**
+```bash
+cp .env.example .env
+# Edit .env and add your GROQ_API_KEY (get it free at console.groq.com)
+```
+
+3. **Build and run with Docker Compose:**
+```bash
+docker-compose up -d
+```
+
+4. **Access the application:**
+Navigate to `http://localhost:8501`
+
+**Useful Docker Commands:**
+```bash
+# View logs
+docker logs optiroute-ai -f
+
+# Stop the application
+docker-compose down
+
+# Restart
+docker-compose restart
+
+# Rebuild after code changes
+docker-compose up -d --build
+```
+
+**Benefits of Docker:**
+- ✅ Zero Python dependency conflicts
+- ✅ Works identically on Windows, Mac, Linux
+- ✅ Production-ready containerization
+- ✅ Easy deployment to cloud (AWS, GCP, Azure)
+
+---
+
+### 💻 Option 2: Manual Installation
 
 1. **Clone the repository:**
 ```bash
@@ -204,8 +257,7 @@ spec:
 |----------|-----|-----------|
 | **LangChain** | Standard abstraction layer for LLMs | Adds dependency, but enables model swapping |
 | **Streamlit** | Fastest MVP frontend | Not for production scale, but perfect for demos |
-| **Groq (both models)** | <100ms latency + zero cost | Free tier limits (14k/day), but perfect for MVP |
-| **Simple heuristics** | Ship fast, iterate later | Less accurate than ML, but good enough for MVP |
+| **Groq (both models)** | <100ms latency + zero cost | Free tier limits (14k/day), but perfect for MVP || **Docker** | Containerization for deployment | Adds overhead, but ensures portability and consistency || **Simple heuristics** | Ship fast, iterate later | Less accurate than ML, but good enough for MVP |
 | **No OpenAI** | Avoid costs during development | Can add later for premium features |
 
 ### What I'd Do Differently at Scale
